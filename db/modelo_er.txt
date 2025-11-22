@@ -1,0 +1,61 @@
+Table rol {
+  id_rol int [pk, increment]
+  nombre_rol varchar(50) [not null]
+}
+
+
+Table usuario {
+  id_usuario int [pk, increment]
+  nombre_completo varchar(100) [not null]
+  usuario varchar(50) [not null, unique]
+  password_hash varchar(255) [not null]
+  id_rol int [not null]
+  activo bit [default: 1]
+}
+
+
+Table estado {
+  id_estado int [pk, increment]
+  descripcion varchar(50) [not null]
+}
+
+
+Table expediente {
+  id_expediente int [pk, increment]
+  numero_expediente varchar(50) [unique, not null]
+  descripcion_general varchar(255)
+  fecha_registro datetime [default: `getdate()`]
+  fecha_actualizacion datetime
+  
+  // Auditoría de quién lo crea y quién lo revisa
+  id_usuario_registra int [not null]
+  id_usuario_revisa int
+  
+  // Control de flujo
+  id_estado int [not null]
+  justificacion_rechazo varchar(max)
+}
+
+
+Table indicio {
+  id_indicio int [pk, increment]
+  id_expediente int [not null]
+  
+  // Características físicas solicitadas
+  descripcion_indicio varchar(255) [not null]
+  color varchar(50)
+  tamano varchar(50)
+  peso decimal(10,2)
+  ubicacion_recoleccion varchar(100)
+  
+  fecha_registro datetime [default: `getdate()`]
+  id_usuario_registra int [not null]
+}
+
+// Relaciones
+Ref: usuario.id_rol > rol.id_rol
+Ref: expediente.id_usuario_registra > usuario.id_usuario
+Ref: expediente.id_usuario_revisa > usuario.id_usuario
+Ref: expediente.id_estado > estado.id_estado
+Ref: indicio.id_expediente > expediente.id_expediente
+Ref: indicio.id_usuario_registra > usuario.id_usuario
