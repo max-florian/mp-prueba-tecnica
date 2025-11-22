@@ -4,6 +4,8 @@ const cors = require('cors');
 
 // Rutas
 const authRoutes = require('./routes/autenticacion');
+const expedientesRoutes = require('./routes/expedientes');
+const indiciosRoutes = require('./routes/indicios');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -14,6 +16,8 @@ app.use(express.json());
 
 // Rutas
 app.use('/mp/autenticacion', authRoutes);
+app.use('/mp/expedientes', expedientesRoutes);
+app.use('/mp/indicios', indiciosRoutes);
 
 app.get('/', (req, res) => {
     res.send('Hola Mundo! :)');
