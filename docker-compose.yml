@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # BASE DE DATOS
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: dicri_db_container
+    user: root
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Guate.2025!MP
+    ports:
+      - "1435:1433" # Mapear el puerto al host
+    volumes:
+      - sqlvolume:/var/opt/mssql # Persistencia de datos
+    networks:
+      - dicri_net
+
+  # BACKEND
+  backend:
+    build: ./backend
+    container_name: dicri_backend_container
+    ports:
+      - "9000:9000"
+    environment:
+      # Sobrescribimos las variables del .env para Docker
+      - DB_USER=sa
+      - DB_PASSWORD=Guate.2025!MP
+      - DB_SERVER=sqlserver
+      - DB_DATABASE=dicridb
+      - JWT_SECRET=PalabraSecretaSuperSeguraParaLaDICRI2025
+      - PORT=9000
+    depends_on:
+      - sqlserver # Espera a que inicie la DB
+    networks:
+      - dicri_net
+
+  # FRONTEND
+  frontend:
+    build: ./frontend
+    container_name: dicri_frontend_container
+    ports:
+      - "8080:80" # Accederemos en localhost:8080
+    depends_on:
+      - backend
+    networks:
+      - dicri_net
+
+volumes:
+  sqlvolume:
+
+networks:
+  dicri_net:
+    driver: bridge
